@@ -1,0 +1,27 @@
+buildscript {
+  ext.kotlinVersion = '2.0.20'
+}
+
+plugins {
+  id 'org.jetbrains.kotlin.js' version "$kotlinVersion"
+}
+
+group 'com.nightlynexus.montyhallproblem'
+version '1.0-SNAPSHOT'
+
+kotlin {
+  js(IR) {
+    browser {
+    }
+    binaries.executable()
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
+  testImplementation "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
+}
