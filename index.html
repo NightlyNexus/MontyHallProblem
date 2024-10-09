@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monty Hall Problem</title>
+  <link rel="shortcut icon" href="goat.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root {
+      color-scheme: light only;
+    }
+
+    .option-box {
+      border: 2px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      width: max-content;
+      height: max-content;
+      position: relative;
+      flex: none;
+      background-color: #FFFFFF;
+    }
+
+    .second-box {
+      width: calc(100% - 1em);
+      height: calc(100% - 1em);
+      position: absolute;
+    }
+
+    .emoji-image {
+      font-size: 2.5em;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      margin: 0.4em;
+      z-index: 1;
+    }
+
+    #grid-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      color: #000000;
+      padding-top: 20px;
+      padding-right: 28px;
+      padding-bottom: 20px;
+      padding-left: 28px;
+      grid-row-gap: 20px;
+    }
+
+    div {
+      white-space: pre-wrap;
+    }
+
+    #input-form {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    html {
+      padding: 10px;
+    }
+
+    body {
+      max-width: 960px;
+      margin: auto;
+      background-color: #90A4AE;
+    }
+  </style>
+</head>
+<body>
+<form id="input-form">
+  <label for="door-count">Doors ( >= Goat reveals + 2 ):</label>
+  <input type="number" id="door-count" min="3" value="3" required>
+  <br><br>
+  <label for="goat-reveal-count">Goat reveals after first choice ( >= 1 ):</label>
+  <input type="number" id="goat-reveal-count" min="1" value="1" required>
+  <br><br>
+  <button type="submit">Reset</button>
+  <span id="input-form-error-message" style="color: red;"></span>
+</form>
+<br><br>
+<div id="grid-container"></div>
+<br>
+<button id="continue-button" disabled>Continue</button>
+<br><br>
+<div id="first-selected-chance-parent" style="display: none;">Chance of prize in BLUE:<br><b id="first-selected-chance"></b><br><br>Chance of prize in YELLOW:<br><b id="first-unselected-chance"></b></div>
+<br><br>
+<div id="goat-chance-parent" style="display: none;">Chance of prize in RED:<br><b id="goat-chance"></b><br><br>Chance of prize in ORANGE:<br><b id="first-unselected-no-goat-chance"></b></div>
+<br><br>
+<div id="second-selected-chance-parent" style="display: none;">Chance of prize in CYAN:<br><b id="second-selected-chance"></b></div>
+<script src="MontyHallProblem.js"></script>
+</body>
+</html>
