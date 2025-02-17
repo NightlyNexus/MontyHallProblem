@@ -258,34 +258,32 @@ private class Game(
     require(goatRevealCount >= 1)
     val doorCount = allDoors.size
     require(doorCount >= goatRevealCount + 2)
-    val sortedSelection = if (firstSelectedDoorIndex == prizeDoorIndex) {
-      ArrayList<Int>(goatRevealCount + 1).apply {
-        add(firstSelectedDoorIndex)
+    var remainingSize: Int
+    val usedIndices = if (firstSelectedDoorIndex == prizeDoorIndex) {
+      remainingSize = doorCount - 1
+      LinkedHashMap<Int, Int>(goatRevealCount + 1).apply {
+        put(firstSelectedDoorIndex, doorCount - 1)
       }
     } else {
-      ArrayList<Int>(goatRevealCount + 2).apply {
-        if (firstSelectedDoorIndex > prizeDoorIndex) {
-          add(prizeDoorIndex)
-          add(firstSelectedDoorIndex)
-        } else {
-          add(firstSelectedDoorIndex)
-          add(prizeDoorIndex)
-        }
+      LinkedHashMap<Int, Int>(goatRevealCount + 2).apply {
+        remainingSize = doorCount - 2
+        put(firstSelectedDoorIndex, doorCount - 1)
+        put(prizeDoorIndex, doorCount - 2)
       }
     }
     for (i in 0 until goatRevealCount) {
-      var roll = random.integer(doorCount - sortedSelection.size)
-      var j = 0
-      while (j < sortedSelection.size) {
-        val oldRoll = sortedSelection[j]
-        if (roll < oldRoll) {
+      val roll = random.integer(remainingSize)
+      var resultingRoll = roll
+      while (true) {
+        val reroutedRoll = usedIndices[resultingRoll]
+        if (reroutedRoll == null) {
           break
         }
-        roll++
-        j++
+        resultingRoll = reroutedRoll
       }
-      sortedSelection.add(j, roll)
-      allDoors[roll].openGoat()
+      usedIndices[roll] = remainingSize - 1
+      remainingSize--
+      allDoors[resultingRoll].openGoat()
     }
   }
 
