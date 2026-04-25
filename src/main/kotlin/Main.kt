@@ -31,6 +31,7 @@ fun main() {
   val secondSelectedChanceParent =
     document.getElementById("second-selected-chance-parent") as HTMLElement
   val secondSelectedChance = document.getElementById("second-selected-chance") as HTMLElement
+  val instructions = document.getElementById("instructions") as HTMLElement
   val continueButton = document.getElementById("continue-button") as HTMLButtonElement
 
   val inputForm = document.getElementById("input-form") as HTMLFormElement
@@ -54,6 +55,7 @@ fun main() {
     firstUnselectedNoGoatChance,
     secondSelectedChanceParent,
     secondSelectedChance,
+    instructions,
     continueButton,
     random
   )
@@ -89,6 +91,7 @@ private class Game(
   private val firstUnselectedNoGoatChance: HTMLElement,
   private val secondSelectedChanceParent: HTMLElement,
   private val secondSelectedChance: HTMLElement,
+  private val instructions: HTMLElement,
   private val continueButton: HTMLButtonElement,
   private val random: RandomNumberGenerator
 ) {
@@ -120,6 +123,8 @@ private class Game(
     goatChanceParent.style.display = "none"
     secondSelectedChanceParent.style.display = "none"
 
+    instructions.textContent =
+      "Click any closed door to guess where the prize is. Then click Continue."
     continueButton.disabled = true
 
     var firstSelectedDoorIndex = -1
@@ -171,6 +176,9 @@ private class Game(
       }
     }
 
+    instructions.textContent = "Monty Hall has revealed $goatRevealCount " +
+      "${if (goatRevealCount == 1) "door" else "doors"} with a goat.\n" +
+      "Click any closed door to make your final guess where the prize is. Then click Continue."
     continueButton.disabled = true
 
     goatChanceParent.style.display = "initial"
@@ -192,7 +200,13 @@ private class Game(
       override fun handleEvent(event: Event) {
         val selectedDoor = allDoors[secondSelectedDoorIndex]
         check(!selectedDoor.isOpenedGoat && selectedDoor.secondSelected)
-        complete(allDoors, prizeDoorIndex)
+        complete(
+          allDoors,
+          prizeDoorIndex,
+          firstSelectedDoorIndex,
+          secondSelectedDoorIndex,
+          goatRevealCount
+        )
       }
     })
 
@@ -238,7 +252,31 @@ private class Game(
     }
   }
 
-  private fun complete(allDoors: List<Door>, prizeDoorIndex: Int) {
+  private fun complete(
+    allDoors: List<Door>,
+    prizeDoorIndex: Int,
+    firstSelectedDoorIndex: Int,
+    secondSelectedDoorIndex: Int,
+    goatRevealCount: Int
+  ) {
+    val doorCount = allDoors.size
+    val worseOddsText = "1 / $doorCount"
+    val betterOddsText = "(1 / ${doorCount - 1 - goatRevealCount}) (${doorCount - 1} / $doorCount)"
+    instructions.textContent = if (prizeDoorIndex == secondSelectedDoorIndex) {
+      if (firstSelectedDoorIndex == secondSelectedDoorIndex) {
+        "You won the prize, beating the odds:  $worseOddsText  <  $betterOddsText"
+      } else {
+        "You won the prize by improving your odds:  $betterOddsText  >  $worseOddsText"
+      }
+    } else {
+      if (firstSelectedDoorIndex == secondSelectedDoorIndex) {
+        "You did not win. You could have improved your odds by changing your selection:  " +
+          "$worseOddsText  <  $betterOddsText"
+      } else {
+        "You did not win, even though you did improve your odds when you changed your " +
+          "selection:  $betterOddsText  >  $worseOddsText"
+      }
+    }
     continueButton.disabled = true
     removeContinueButtonClickListener()
 
