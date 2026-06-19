@@ -296,32 +296,28 @@ private class Game(
     require(goatRevealCount >= 1)
     val doorCount = allDoors.size
     require(doorCount >= goatRevealCount + 2)
-    var remainingSize: Int
-    val usedIndices = if (firstSelectedDoorIndex == prizeDoorIndex) {
-      remainingSize = doorCount - 1
-      LinkedHashMap<Int, Int>(goatRevealCount + 1).apply {
-        put(firstSelectedDoorIndex, doorCount - 1)
+
+    val excludedIndices = if (firstSelectedDoorIndex == prizeDoorIndex) {
+      LinkedHashSet<Int>(1).apply {
+        add(firstSelectedDoorIndex)
       }
     } else {
-      LinkedHashMap<Int, Int>(goatRevealCount + 2).apply {
-        remainingSize = doorCount - 2
-        put(firstSelectedDoorIndex, doorCount - 1)
-        put(prizeDoorIndex, doorCount - 2)
+      LinkedHashSet<Int>(2).apply {
+        add(firstSelectedDoorIndex)
+        add(prizeDoorIndex)
       }
     }
-    for (i in 0 until goatRevealCount) {
-      val roll = random.integer(remainingSize)
-      var resultingRoll = roll
-      while (true) {
-        val reroutedRoll = usedIndices[resultingRoll]
-        if (reroutedRoll == null) {
-          break
+    uniqueRolls(
+      availableOptions = allDoors,
+      excludedIndices,
+      selectCount = goatRevealCount,
+      object : com.nightlynexus.RandomNumberGenerator {
+        override fun integer(until: Int): Int {
+          return random.integer(until)
         }
-        resultingRoll = reroutedRoll
       }
-      usedIndices[roll] = remainingSize - 1
-      remainingSize--
-      allDoors[resultingRoll].openGoat()
+    ) {
+      it.openGoat()
     }
   }
 
